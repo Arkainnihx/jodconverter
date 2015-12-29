@@ -24,12 +24,18 @@ import org.artofsolving.jodconverter.office.OfficeContext;
 import org.artofsolving.jodconverter.office.OfficeException;
 import org.artofsolving.jodconverter.office.OfficeTask;
 
+import com.sun.star.beans.PropertyVetoException;
+import com.sun.star.beans.UnknownPropertyException;
+import com.sun.star.beans.XPropertySet;
 import com.sun.star.frame.XComponentLoader;
 import com.sun.star.frame.XStorable;
 import com.sun.star.io.IOException;
 import com.sun.star.lang.IllegalArgumentException;
+import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.lang.XComponent;
 import com.sun.star.task.ErrorCodeIOException;
+import com.sun.star.text.XLineNumberingProperties;
+import com.sun.star.uno.UnoRuntime;
 import com.sun.star.util.CloseVetoException;
 import com.sun.star.util.XCloseable;
 
@@ -47,11 +53,18 @@ public abstract class AbstractConversionTask implements OfficeTask {
 
     protected abstract Map<String,?> getStoreProperties(File outputFile, XComponent document);
 
+    @Override
     public void execute(OfficeContext context) throws OfficeException {
+    	execute(context, false);
+    }
+    
+    @Override
+    public void execute(OfficeContext context, Boolean enableLineNumbering) throws OfficeException {
         XComponent document = null;
+             
         try {
             document = loadDocument(context, inputFile);
-            modifyDocument(document);
+            modifyDocument(document, enableLineNumbering);
             storeDocument(document, outputFile);
         } catch (OfficeException officeException) {
             throw officeException;
@@ -72,8 +85,8 @@ public abstract class AbstractConversionTask implements OfficeTask {
             }
         }
     }
-
-    private XComponent loadDocument(OfficeContext context, File inputFile) throws OfficeException {
+    
+      private XComponent loadDocument(OfficeContext context, File inputFile) throws OfficeException {
         if (!inputFile.exists()) {
             throw new OfficeException("input document not found");
         }
@@ -99,13 +112,13 @@ public abstract class AbstractConversionTask implements OfficeTask {
      * Override to modify the document after it has been loaded and before it gets
      * saved in the new format.
      * <p>
-     * Does nothing by default.
+     * Does nothing by default. 
      * 
      * @param document
      * @throws OfficeException
      */
-    protected void modifyDocument(XComponent document) throws OfficeException {
-    	// noop
+    protected void modifyDocument(XComponent document, Boolean enableLineNumbering) throws OfficeException {
+    	
     }
 
     private void storeDocument(XComponent document, File outputFile) throws OfficeException {

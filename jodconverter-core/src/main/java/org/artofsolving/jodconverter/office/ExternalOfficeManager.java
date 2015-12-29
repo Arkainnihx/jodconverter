@@ -63,11 +63,14 @@ class ExternalOfficeManager implements OfficeManager {
 	}
 
 	public void execute(OfficeTask task) throws OfficeException {
+		execute(task, false);
+	}
+	public void execute(OfficeTask task, Boolean enableLineNumbering) throws OfficeException {
 		synchronized (connection) {
 			if (!connection.isConnected()) {
 				connect();
 			}
-			task.execute(connection);
+			task.execute(connection, enableLineNumbering);
 		}
 	}
 

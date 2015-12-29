@@ -62,7 +62,8 @@ class PooledOfficeManager implements OfficeManager {
         taskExecutor = new SuspendableThreadPoolExecutor(new NamedThreadFactory("OfficeTaskThread"));
     }
 
-    public void execute(final OfficeTask task) throws OfficeException {
+    @Override
+	public void execute(final OfficeTask task, final Boolean enableLineNumbering) throws OfficeException {
         Future<?> futureTask = taskExecutor.submit(new Runnable() {
             public void run() {
                 if (settings.getMaxTasksPerProcess() > 0 && ++taskCount == settings.getMaxTasksPerProcess() + 1) {
@@ -72,7 +73,7 @@ class PooledOfficeManager implements OfficeManager {
                     managedOfficeProcess.restartAndWait();
                     //FIXME taskCount will be 0 rather than 1 at this point
                 }
-                task.execute(managedOfficeProcess.getConnection());
+                task.execute(managedOfficeProcess.getConnection(), enableLineNumbering);
              }
          });
          currentTask = futureTask;
@@ -107,4 +108,11 @@ class PooledOfficeManager implements OfficeManager {
 		return managedOfficeProcess.isConnected();
 	}
 
+	@Override
+	public void execute(OfficeTask task) throws OfficeException {
+		execute(task, false);
+		
+	}
+
+	
 }

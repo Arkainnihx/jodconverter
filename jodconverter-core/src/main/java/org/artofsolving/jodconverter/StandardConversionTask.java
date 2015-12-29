@@ -22,7 +22,14 @@ import org.artofsolving.jodconverter.document.DocumentFamily;
 import org.artofsolving.jodconverter.document.DocumentFormat;
 import org.artofsolving.jodconverter.office.OfficeException;
 
+import com.sun.star.beans.PropertyVetoException;
+import com.sun.star.beans.UnknownPropertyException;
+import com.sun.star.beans.XPropertySet;
+import com.sun.star.lang.IllegalArgumentException;
+import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.lang.XComponent;
+import com.sun.star.text.XLineNumberingProperties;
+import com.sun.star.uno.UnoRuntime;
 import com.sun.star.util.XRefreshable;
 
 public class StandardConversionTask extends AbstractConversionTask {
@@ -46,12 +53,44 @@ public class StandardConversionTask extends AbstractConversionTask {
     }
 
     @Override
-    protected void modifyDocument(XComponent document) throws OfficeException {
+    protected void modifyDocument(XComponent document, Boolean enableLineNumbering) throws OfficeException {
+    	
+    	if (enableLineNumbering) {
+	    	XLineNumberingProperties oLNP =  UnoRuntime.queryInterface(XLineNumberingProperties.class, document);
+			XPropertySet lineNumProps = oLNP.getLineNumberingProperties();
+			setLineNumbering(lineNumProps);
+    	}
+    	
         XRefreshable refreshable = cast(XRefreshable.class, document);
         if (refreshable != null) {
             refreshable.refresh();
         }
     }
+    
+    private void setLineNumbering(XPropertySet lineNumProps) {
+  		try {
+  			lineNumProps.setPropertyValue("IsOn", Boolean.TRUE);
+  			lineNumProps.setPropertyValue("CountEmptyLines", Boolean.FALSE);
+  			lineNumProps.setPropertyValue("RestartAtEachPage", Boolean.FALSE);
+  			short interval = 1;
+  			lineNumProps.setPropertyValue("Interval", interval);
+  		} catch (UnknownPropertyException e) {
+  			// TODO Auto-generated catch block
+  			e.printStackTrace();
+  		} catch (PropertyVetoException e) {
+  			// TODO Auto-generated catch block
+  			e.printStackTrace();
+  		} catch (IllegalArgumentException e) {
+  			// TODO Auto-generated catch block
+  			e.printStackTrace();
+  		} catch (WrappedTargetException e) {
+  			// TODO Auto-generated catch block
+  			e.printStackTrace();
+  		}
+  		
+      }
+
+
 
     @Override
     protected Map<String,?> getLoadProperties(File inputFile) {
@@ -70,5 +109,6 @@ public class StandardConversionTask extends AbstractConversionTask {
         DocumentFamily family = OfficeDocumentUtils.getDocumentFamily(document);
         return outputFormat.getStoreProperties(family);
     }
+
 
 }

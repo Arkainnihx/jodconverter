@@ -27,7 +27,8 @@ import org.artofsolving.jodconverter.office.OfficeManager;
 import org.artofsolving.jodconverter.office.DefaultOfficeManagerConfiguration;
 import org.testng.annotations.Test;
 
-@Test(groups="functional")
+//@Test(groups="functional")
+@Test(enabled=false)
 public class OfficeDocumentConverterFunctionalTest {
 
     public void runAllPossibleConversions() throws IOException {
@@ -52,7 +53,7 @@ public class OfficeDocumentConverterFunctionalTest {
                     File outputFile = File.createTempFile("test", "." + outputFormat.getExtension());
                     outputFile.deleteOnExit();
                     System.out.printf("-- converting %s to %s... ", inputFormat.getExtension(), outputFormat.getExtension());
-                    converter.convert(inputFile, outputFile, outputFormat);
+                    converter.convert(inputFile, outputFile, outputFormat, false);
                     System.out.printf("done.\n");
                     assertTrue(outputFile.isFile() && outputFile.length() > 0);
                     //TODO use file detection to make sure outputFile is in the expected format

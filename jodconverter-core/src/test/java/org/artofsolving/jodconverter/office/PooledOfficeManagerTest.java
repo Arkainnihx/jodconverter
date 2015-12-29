@@ -32,7 +32,8 @@ import org.artofsolving.jodconverter.office.OfficeException;
 import org.artofsolving.jodconverter.office.OfficeProcess;
 import org.testng.annotations.Test;
 
-@Test(groups="integration")
+//@Test(groups="integration")
+@Test(enabled=false)
 public class PooledOfficeManagerTest {
 
     private static final UnoUrl CONNECTION_MODE = UnoUrl.socket(2002);

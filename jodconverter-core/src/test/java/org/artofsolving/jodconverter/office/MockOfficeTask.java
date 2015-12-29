@@ -37,7 +37,7 @@ public class MockOfficeTask implements OfficeTask {
         this.delayTime = delayTime;
     }
 
-    public void execute(OfficeContext context) throws OfficeException {
+    public void execute(OfficeContext context,  Boolean enableLineNumbering) throws OfficeException {
         XComponentLoader loader = cast(XComponentLoader.class, context.getService(SERVICE_DESKTOP));
         assert loader != null : "desktop object is null";
         try {
@@ -56,5 +56,9 @@ public class MockOfficeTask implements OfficeTask {
     public boolean isCompleted() {
         return completed;
     }
+
+	 public void execute(OfficeContext context) throws OfficeException {	
+		 execute(context, false);
+	}
 
 }

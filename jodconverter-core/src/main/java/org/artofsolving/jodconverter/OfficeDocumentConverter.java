@@ -57,19 +57,26 @@ public class OfficeDocumentConverter {
         return formatRegistry;
     }
 
+    public void convert(File inputFile, File outputFile, Boolean enableLineNumbering) throws OfficeException {
+        String outputExtension = FilenameUtils.getExtension(outputFile.getName());
+        DocumentFormat outputFormat = formatRegistry.getFormatByExtension(outputExtension);
+        convert(inputFile, outputFile, outputFormat, enableLineNumbering);
+    }
+    
     public void convert(File inputFile, File outputFile) throws OfficeException {
         String outputExtension = FilenameUtils.getExtension(outputFile.getName());
         DocumentFormat outputFormat = formatRegistry.getFormatByExtension(outputExtension);
-        convert(inputFile, outputFile, outputFormat);
+        Boolean enableLineNumbering = false;
+        convert(inputFile, outputFile, outputFormat, enableLineNumbering);
     }
 
-    public void convert(File inputFile, File outputFile, DocumentFormat outputFormat) throws OfficeException {
+    public void convert(File inputFile, File outputFile, DocumentFormat outputFormat, Boolean enableLineNumbering) throws OfficeException {
         String inputExtension = FilenameUtils.getExtension(inputFile.getName());
         DocumentFormat inputFormat = formatRegistry.getFormatByExtension(inputExtension);
         StandardConversionTask conversionTask = new StandardConversionTask(inputFile, outputFile, outputFormat);
         conversionTask.setDefaultLoadProperties(defaultLoadProperties);
         conversionTask.setInputFormat(inputFormat);
-        officeManager.execute(conversionTask);
+        officeManager.execute(conversionTask, enableLineNumbering);
     }
 
 }

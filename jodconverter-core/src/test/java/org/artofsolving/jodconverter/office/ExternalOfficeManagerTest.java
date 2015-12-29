@@ -20,9 +20,10 @@ import org.artofsolving.jodconverter.ReflectionUtils;
 import org.artofsolving.jodconverter.process.PureJavaProcessManager;
 import org.testng.annotations.Test;
 
-@Test(groups="integration")
+//@Test(groups="integration")
+@Test(enabled=false)
 public class ExternalOfficeManagerTest {
-
+	
     public void executeTask() throws Exception {
         UnoUrl unoUrl = UnoUrl.socket(2002);
         OfficeProcess officeProcess = new OfficeProcess(OfficeUtils.getDefaultOfficeHome(), unoUrl,

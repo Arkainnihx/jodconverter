@@ -16,4 +16,6 @@ public interface OfficeTask {
 
     void execute(OfficeContext context) throws OfficeException;
 
+	void execute(OfficeContext context, Boolean enableLineNumbering) throws OfficeException;
+
 }

@@ -21,6 +21,8 @@ package org.artofsolving.jodconverter.office;
 public interface OfficeManager {
 
     void execute(OfficeTask task) throws OfficeException;
+    
+    void execute(OfficeTask task, Boolean enableLineNumbering) throws OfficeException;
 
     void start() throws OfficeException;
 

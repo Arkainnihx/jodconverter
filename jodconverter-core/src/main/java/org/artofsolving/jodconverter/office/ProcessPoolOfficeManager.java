@@ -59,7 +59,13 @@ class ProcessPoolOfficeManager implements OfficeManager {
         running = true;
     }
 
-    public void execute(OfficeTask task) throws IllegalStateException, OfficeException {
+    @Override
+	public void execute(OfficeTask task) throws OfficeException {
+    	execute(task, false);		
+	}
+    
+    @Override
+    public void execute(OfficeTask task, Boolean enableLineNumbering) throws OfficeException {
         if (!running) {
             throw new IllegalStateException("this OfficeManager is currently stopped");
         }
@@ -69,7 +75,7 @@ class ProcessPoolOfficeManager implements OfficeManager {
             if (manager == null) {
                 throw new OfficeException("no office manager available");
             }
-            manager.execute(task);
+            manager.execute(task, enableLineNumbering);
         } finally {
             if (manager != null) {
                 releaseManager(manager);
@@ -106,5 +112,7 @@ class ProcessPoolOfficeManager implements OfficeManager {
 	public boolean isRunning() {
 		return running;
 	}
+
+	
 
 }
