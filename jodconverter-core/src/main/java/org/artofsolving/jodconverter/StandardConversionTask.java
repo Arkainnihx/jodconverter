@@ -25,9 +25,14 @@ import org.artofsolving.jodconverter.office.OfficeException;
 import com.sun.star.beans.PropertyVetoException;
 import com.sun.star.beans.UnknownPropertyException;
 import com.sun.star.beans.XPropertySet;
+import com.sun.star.container.NoSuchElementException;
+import com.sun.star.container.XNameAccess;
+import com.sun.star.container.XNameContainer;
 import com.sun.star.lang.IllegalArgumentException;
 import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.lang.XComponent;
+import com.sun.star.style.XStyle;
+import com.sun.star.style.XStyleFamiliesSupplier;
 import com.sun.star.text.XLineNumberingProperties;
 import com.sun.star.uno.UnoRuntime;
 import com.sun.star.util.XRefreshable;
@@ -59,12 +64,33 @@ public class StandardConversionTask extends AbstractConversionTask {
 	    	XLineNumberingProperties oLNP =  UnoRuntime.queryInterface(XLineNumberingProperties.class, document);
 			XPropertySet lineNumProps = oLNP.getLineNumberingProperties();
 			setLineNumbering(lineNumProps);
-    	}
+    	}	
+		
+    	// Always turn off headers & footers
+		try { 	
+			XStyleFamiliesSupplier xSupplier = (XStyleFamiliesSupplier) UnoRuntime.queryInterface(XStyleFamiliesSupplier.class, document);
+			XNameAccess xFamilies = (XNameAccess) UnoRuntime.queryInterface (XNameAccess.class, xSupplier.getStyleFamilies());
+			XNameContainer xFamily = (XNameContainer) UnoRuntime.queryInterface( 
+			XNameContainer.class, xFamilies.getByName("PageStyles"));
+			// The style name may be "Default Style" or just "Default"
+			XStyle xStyle = null;
+			try {
+				 xStyle = (XStyle) UnoRuntime.queryInterface(XStyle.class, xFamily.getByName("Default Style"));
+			} catch (NoSuchElementException e){
+				 xStyle = (XStyle) UnoRuntime.queryInterface(XStyle.class, xFamily.getByName("Default"));
+			}
+			XPropertySet xStyleProps = (XPropertySet) UnoRuntime.queryInterface(XPropertySet.class, xStyle);
+			xStyleProps.setPropertyValue ("HeaderIsOn", Boolean.FALSE);
+			xStyleProps.setPropertyValue ("FooterIsOn", Boolean.FALSE);
+		} catch (WrappedTargetException|IllegalArgumentException|PropertyVetoException|UnknownPropertyException | NoSuchElementException e ) {
+			e.printStackTrace();
+		}
     	
         XRefreshable refreshable = cast(XRefreshable.class, document);
         if (refreshable != null) {
             refreshable.refresh();
         }
+        
     }
     
     private void setLineNumbering(XPropertySet lineNumProps) {
@@ -74,17 +100,7 @@ public class StandardConversionTask extends AbstractConversionTask {
   			lineNumProps.setPropertyValue("RestartAtEachPage", Boolean.FALSE);
   			short interval = 1;
   			lineNumProps.setPropertyValue("Interval", interval);
-  		} catch (UnknownPropertyException e) {
-  			// TODO Auto-generated catch block
-  			e.printStackTrace();
-  		} catch (PropertyVetoException e) {
-  			// TODO Auto-generated catch block
-  			e.printStackTrace();
-  		} catch (IllegalArgumentException e) {
-  			// TODO Auto-generated catch block
-  			e.printStackTrace();
-  		} catch (WrappedTargetException e) {
-  			// TODO Auto-generated catch block
+  		} catch (WrappedTargetException|IllegalArgumentException|PropertyVetoException|UnknownPropertyException e ) {
   			e.printStackTrace();
   		}
   		
